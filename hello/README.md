@@ -16,15 +16,18 @@ fastmcp run server.py --transport=streamable-http
 
 List tools:
 ```shell
-python3 ../client.py list-tools
+python3 ../client/main.py list-tools
 ```
 
 Call the one tool defined:
 ```shell
-python3 ../client.py call-tool greet --name='World'
+python3 ../client/main.py call-tool greet --name='World'
 ```
 
 or list resources:
 ```shell
-python3 ../client.py list-resources
+python3 ../client/main.py list-resources
 ```
+
+## References
+* https://github.com/danlapid/python-workers-mcp/blob/main/README.md

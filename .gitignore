@@ -175,3 +175,10 @@ cython_debug/
 
 # IDE
 .idea
+
+# Node tools
+/node_modules
+
+# Data
+credentials.json
+clients.json

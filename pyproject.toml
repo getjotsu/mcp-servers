@@ -3,8 +3,14 @@ name = "mcp-servers"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "click>=8.2.1",
-    "mcp>=1.9.1",
+    "mcp[cli]>=1.9.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "hello",
+    "oauth2",
 ]
