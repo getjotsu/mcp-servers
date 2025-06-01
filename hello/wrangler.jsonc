@@ -1,0 +1,20 @@
+{
+    "name": "hello-mcp",
+    "main": "src/worker.py",
+    "compatibility_flags": [
+        "python_workers"
+    ],
+    "compatibility_date": "2025-05-08",
+    "rules": [
+        {
+            "globs": [
+                "vendor/**/"
+            ],
+            "type": "Data",
+            "fallthrough": true
+        }
+    ],
+    "observability": {
+        "enabled": true
+    }
+}

@@ -8,3 +8,8 @@ dependencies = [
     "click>=8.1.8",
     "fastmcp>=2.5.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pipdeptree>=2.26.1",
+]

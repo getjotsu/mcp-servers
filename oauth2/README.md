@@ -14,8 +14,14 @@ Create a `.env` file in this directory with the following:
 ```shell
 DISCORD_CLIENT_ID=<DISCORD_CLIENT_ID>
 DISCORD_CLIENT_SECRET=<DISCORD_CLIENT_SECRET>
+SECRET_KEY=<random value>
 ```
-replacing the values with the ID and secret from your Discord application above.
+replacing the values with the client ID and client secret from your Discord application above.
+
+The secret key should be a random value.  A good way to generate a secret is:
+```shell
+python3 -c 'import secrets;print(secrets.token_hex(16))'
+```
 
 ```shell
 uv venv
@@ -51,6 +57,36 @@ The client sends a GET request to `/.well-known/oauth-authorization-server` on t
 python3 ../client.py get /.well-known/oauth-authorization-server
 ```
 
+## Cloudflare
+
+### KV
+This client uses a single Cloudflare KV store for both cache and clients.
+
+```shell
+npx wrangler kv namespace create cache
+```
+
+and replace the "id" of "cache" in the "kv_namespaces" section of `wrangler.jsonc`.
+
+### Worker environment
+The worker need additional packages beyond the standard library.  To build the pyodide environment:
+```shell
+make
+```
+
+Try it locally:
+```shell
+npx wrangler dev
+```
+
+Make sure you've added your environment to `.dev.vars`.
+
+To deploy it, you'll need to set the values as secrets via wrangler:
+```shell
+npx wrangler secret put DISCORD_CLIENT_ID
+npx wrangler secret put DISCORD_CLIENT_SECRET
+npx wrangler secret put SECRET_KEY
+```
 
 ## References
 * https://github.com/lukasthaler/fastapi-oauth-examples

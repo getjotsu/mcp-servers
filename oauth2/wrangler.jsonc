@@ -1,0 +1,26 @@
+{
+    "name": "oauth2-discord",
+    "main": "src/worker.py",
+    "compatibility_flags": [
+        "python_workers"
+    ],
+    "compatibility_date": "2025-05-08",
+    "rules": [
+        {
+            "globs": [
+                "vendor/**/"
+            ],
+            "type": "Data",
+            "fallthrough": true
+        }
+    ],
+    "observability": {
+        "enabled": true
+    },
+    "kv_namespaces": [
+        {
+            "binding": "cache",
+            "id": "b75592f98ada489d9665b656bf6054f3"
+        }
+    ]
+}

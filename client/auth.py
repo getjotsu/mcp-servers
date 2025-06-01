@@ -7,10 +7,9 @@ import webbrowser
 from queue import Queue
 
 import click
-import httpx
 import pkce
-import pydantic
-from mcp.server.auth.handlers.token import RefreshTokenRequest, AuthorizationCodeRequest
+from jotsu.mcp.client import OAuth2AuthorizationCodeClient
+from mcp.server.auth.provider import RefreshToken
 
 from client import utils, localserver
 
@@ -24,69 +23,40 @@ def get_access_token() -> str | None:
     return None
 
 
-def do_token_refresh() -> str | None:
+async def token_refresh(credentials: dict) -> str | None:
     """ Try to use our refresh token to get a new access token. """
-    credentials = utils.credentials_read()
-    if credentials:
-        refresh_token = credentials.get('refresh_token')
-        token_endpoint = credentials.get('token_endpoint')
+    oauth = OAuth2AuthorizationCodeClient(**credentials)
 
-        if refresh_token and token_endpoint:
-            req = RefreshTokenRequest(
-                grant_type='refresh_token',
-                refresh_token=refresh_token,
-                scope=credentials.get('scope'),
-                client_id=credentials.get('client_id'),
-                client_secret=credentials.get('client_secret')
-            )
-            res = httpx.post(token_endpoint, data=req.model_dump())
-            if res.status_code != 200:
-                logger.info('Could not refresh access token: [%d] %s', res.status_code, res.text)
-                return None
-
-            # Keep values not included in the token response, like the endpoints.
-            credentials = {**credentials, **res.json()}
-            utils.credentials_save(credentials)
-            return credentials['access_token']
-
+    refresh_token = RefreshToken(**credentials)
+    token = await oauth.exchange_refresh_token(refresh_token=refresh_token, scopes=[])
+    if token:
+        # Keep values not included in the token response, like the endpoints.
+        credentials = {**credentials, **token.model_dump(mode='json')}
+        utils.credentials_save(credentials)
+        return token.access_token
     return None
 
 
-def do_authentication(base_url: str) -> bool:
+async def handle_authentication(mcp_url: str) -> bool:
     # Try refresh first instead of forcing the user to re-authenticate.
-    access_token = do_token_refresh()
-    if access_token:
-        # Credentials file is updated with a valid tokens, return and let the client read from there.
-        return True
+    credentials = utils.credentials_read()
+
+    if credentials:
+        access_token = token_refresh(credentials)
+        if access_token:
+            # Credentials file is updated with a valid tokens, return and let the client read from there.
+            return True
+
+    base_url = utils.server_url('', base_url=mcp_url)
 
     # Server Metadata Discovery (SHOULD)
-    url = utils.server_url('/.well-known/oauth-authorization-server', base_url=base_url)
-    logger.info('Trying server metadata discovery at %s', url)
-    try:
-        res = httpx.get(url)
-        server_metadata = res.json()
-        authorization_endpoint = server_metadata['authorization_endpoint']
-        token_endpoint = server_metadata['token_endpoint']
-        registration_endpoint = server_metadata['registration_endpoint']
-        logger.info('Server metadata found: %s', json.dumps(server_metadata))
-    except httpx.HTTPStatusError as e:
-        logger.info('Server metadata discovery not found, using default endpoints.', url)
-        if e.response.status_code == 404:
-            authorization_endpoint = utils.server_url('/authorize', base_url=base_url)
-            token_endpoint = utils.server_url('/token', base_url=base_url)
-            registration_endpoint = utils.server_url('/register', base_url=base_url)
-        else:
-            raise e
+    server_metadata = await OAuth2AuthorizationCodeClient.server_metadata_discovery(base_url=base_url)
 
     # Dynamic Client Registration (SHOULD)
     # NOTE: fail if the server doesn't support DCR.
-    logger.info('Trying dynamic client registration at %s', registration_endpoint)
-    res = httpx.post(registration_endpoint, json={'redirect_uris': ['http://localhost:8001/']})
-    res.raise_for_status()
-
-    client = res.json()
-    assert 'code' in client['response_types']
-    logger.info('Client registration successful: %s', json.dumps(client))
+    client_info = await OAuth2AuthorizationCodeClient.dynamic_client_registration(
+        registration_endpoint=server_metadata.registration_endpoint, redirect_uris=['http://localhost:8001/']
+    )
 
     queue = Queue()
     httpd = localserver.LocalHTTPServer(queue)
@@ -97,7 +67,7 @@ def do_authentication(base_url: str) -> bool:
     code_verifier, code_challenge = pkce.generate_pkce_pair()
 
     redirect_uri = urllib.parse.quote('http://localhost:8001/')
-    url = f"{authorization_endpoint}?client_id={client['client_id']}" + \
+    url = f"{server_metadata.authorization_endpoint}?client_id={client_info.client_id}" + \
         f'&response_type=code&code_challenge={code_challenge}&redirect_uri={redirect_uri}'
     click.echo(f'Opening a link in your default browser: {url}')
     webbrowser.open(url)
@@ -105,33 +75,31 @@ def do_authentication(base_url: str) -> bool:
     # The local webserver writes an event to the queue on success.
     params = queue.get(timeout=120)
     logger.info('Browser authentication complete: %s', json.dumps(params))
-    code = params.get('code')
+    code = params.get('code')   # this is a list
     if not code:
         logger.error('Authorization failed, likely due to being canceled.')
         return False
 
-    logger.info('Exchanging authorization code for token at %s', token_endpoint)
+    logger.info('Exchanging authorization code for token at %s', server_metadata.token_endpoint)
 
-    req = AuthorizationCodeRequest(
-        grant_type='authorization_code',
+    client = OAuth2AuthorizationCodeClient(
+        **client_info.model_dump(mode='json'),
+        authorize_endpoint=server_metadata.authorization_endpoint,
+        token_endpoint=server_metadata.token_endpoint
+    )
+    token = await client.exchange_authorization_code(
         code=code[0],
         code_verifier=code_verifier,
-        client_id=client['client_id'],
-        client_secret=client['client_secret'],
-        redirect_uri=pydantic.AnyHttpUrl('http://localhost:8001/')
+        redirect_uri='http://localhost:8001/'
     )
-    res = httpx.post(token_endpoint, data=req.model_dump(mode='json'))
-    if res.status_code != 200:
-        logger.warning('%d %s: %s', res.status_code, res.reason_phrase, res.text)
-    res.raise_for_status()
 
     utils.credentials_save(
-        res.json(),
-        client_id=client['client_id'],
-        client_secret=client['client_secret'],
-        authorization_endpoint=authorization_endpoint,
-        token_endpoint=token_endpoint,
-        registration_endpoint=registration_endpoint
+        token.model_dump(mode='json'),
+        client_id=client_info.client_id,
+        client_secret=client_info.client_secret,
+        authorization_endpoint=server_metadata.authorization_endpoint,
+        token_endpoint=server_metadata.token_endpoint,
+        registration_endpoint=server_metadata.registration_endpoint
     )
     return True
 
@@ -142,17 +110,18 @@ def authenticate(f):
     This function must be called with @click.pass_context.
     """
     @functools.wraps(f)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         try:
-            return f(*args, **kwargs)
+            return await f(*args, **kwargs)
         except BaseExceptionGroup as e:
             if not utils.is_httpx_401_exception(e):
                 raise e
 
         ctx = args[0]
         base_url = ctx.obj['URL']
-        if do_authentication(base_url=base_url):
-            return f(*args, **kwargs)
+
+        if await handle_authentication(mcp_url=base_url):
+            return await f(*args, **kwargs)
 
         return None
 

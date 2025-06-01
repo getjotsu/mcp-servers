@@ -17,7 +17,10 @@ CREDENTIALS_PATH = os.path.join(HOME, 'credentials.json')
 def async_cmd(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        return asyncio.run(f(*args, **kwargs))
+        coro = f(*args, **kwargs)
+        if asyncio.iscoroutine(coro):
+            return asyncio.run(coro)
+        raise TypeError(f"Expected coroutine, got {type(coro)}")
 
     return wrapper
 

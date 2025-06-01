@@ -5,17 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "authlib>=1.6.0",
-    "click>=8.2.1",
-    "fastmcp>=2.5.0",
+    "fastmcp>=2.5.2",
     "itsdangerous>=2.2.0",
-    "pkce>=1.0.3",
+    "jotsu-mcp>=0.1.0",
     "pyjwt>=2.10.1",
-    "python-dotenv>=1.1.0",
+    "structlog>=25.3.0",
 ]
 
 [dependency-groups]
 dev = [
     "flake8>=7.2.0",
     "flake8-quotes>=3.4.0",
+    "pyodide-build>=0.30.4",
 ]

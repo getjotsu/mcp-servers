@@ -4,13 +4,17 @@ import sys
 
 import click
 import httpx
+import certifi
 from contextlib import asynccontextmanager
+
+os.environ["SSL_CERT_FILE"] = certifi.where()
 
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 from client import utils  # noqa
 from client.auth import authenticate, get_access_token  # noqa
@@ -47,20 +51,8 @@ def cli(ctx, url, log_level):
 
 @cli.command()
 @click.pass_context
-@authenticate
 @utils.async_cmd
-async def list_tools(ctx):
-    """List server tools"""
-    async with client_session(ctx) as session:
-        result = await session.list_tools()
-        for tool in result.tools:
-            click.echo(tool)
-
-
-@cli.command()
-@click.pass_context
 @authenticate
-@utils.async_cmd
 async def list_resources(ctx):
     """List server resources"""
     async with client_session(ctx) as session:
@@ -69,12 +61,37 @@ async def list_resources(ctx):
             click.echo(resource)
 
 
+@cli.command()
+@click.pass_context
+@click.argument('uri')
+@utils.async_cmd
+@authenticate
+async def read_resource(ctx, uri):
+    """List server resources"""
+    async with client_session(ctx) as session:
+        result = await session.read_resource(uri)
+        for content in result.contents:
+            click.echo(content)
+
+
+@cli.command()
+@click.pass_context
+@utils.async_cmd
+@authenticate
+async def list_tools(ctx):
+    """List server tools"""
+    async with client_session(ctx) as session:
+        result = await session.list_tools()
+        for tool in result.tools:
+            click.echo(tool)
+
+
 @cli.command(context_settings=dict(ignore_unknown_options=True))
 @click.pass_context
 @click.argument('name')
 @click.argument('args', nargs=-1)
-@authenticate
 @utils.async_cmd
+@authenticate
 async def call_tool(ctx, name, args):
     """Call/invoke a tool"""
     kwargs = utils.click_kwargs(args)

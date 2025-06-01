@@ -130,11 +130,13 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-pyodide
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+node_modules
 
 # Spyder project settings
 .spyderproject
@@ -182,3 +184,13 @@ cython_debug/
 # Data
 credentials.json
 clients.json
+
+# Pyodite install
+vendor
+
+# logs
+oauth2-log.txt
+
+# Cloudflare
+.dev.vars
+.wrangler

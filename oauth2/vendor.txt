@@ -1,0 +1,6 @@
+# Non-standard requirements file used for the pyodide install via HOME/scripts/build.sh.
+mcp
+structlog
+jotsu-mcp
+pyjwt
+httpx==0.27.0

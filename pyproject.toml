@@ -1,12 +1,12 @@
 [project]
 name = "mcp-servers"
 version = "0.1.0"
-description = "Add your description here"
+description = "A collection of example servers."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "click>=8.2.1",
-    "mcp[cli]>=1.9.1",
+    "mcp[cli]>=1.9.1"
 ]
 
 [tool.uv.workspace]
