@@ -31,7 +31,7 @@ uv pip install .
 
 ## server
 ```shell
-fastmcp run server.py --transport=streamable-http
+fastmcp run src/main.py --transport=streamable-http
 ```
 
 ## client

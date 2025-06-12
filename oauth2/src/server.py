@@ -12,7 +12,7 @@ from starlette.applications import Starlette
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from starlette.requests import Request
-from starlette.responses import Response, RedirectResponse
+from starlette.responses import Response, RedirectResponse, HTMLResponse
 from starlette.exceptions import HTTPException
 
 from mcp.server.fastmcp import FastMCP
@@ -357,4 +357,23 @@ def make_server(
             logger.exception('httpx.get: %s', str(e))
             raise e
 
+    @mcp.custom_route('/', methods=['GET'])
+    async def home(request: Request) -> Response:
+        """ Generic home route """
+        html = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>oauth2_discord</title>
+        </head>
+        <body>
+            <h1>oauth2_discord</h1>
+            <p>This is an example MCP server.  See <a href="https://github.com/getjotsu/mcp-servers/blob/main/oauth2/README.md">GitHub</a> for more details.
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html)
+
     return mcp
+
