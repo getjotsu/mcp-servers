@@ -3,19 +3,17 @@ import logging
 import os
 import time
 import typing
-from contextvars import ContextVar
 
 import httpx
 from pydantic import BaseModel, AnyHttpUrl
 from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 from starlette.applications import Starlette
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse, HTMLResponse
 from starlette.exceptions import HTTPException
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 from mcp.server.auth.provider import OAuthAuthorizationServerProvider, AuthorizationParams, AuthorizationCode, \
     RefreshToken, AccessToken
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
@@ -236,17 +234,6 @@ class AuthServerProvider(OAuthAuthorizationServerProvider):
         )
 
 
-request_headers: ContextVar[dict] = ContextVar('request_headers', default={})
-
-
-# In v2, the whole request is part of the context, but not in v1.  So we add a custom context
-# containing all request headers that whoami can use.
-class HeadersMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        request_headers.set(dict(request.headers))
-        response = await call_next(request)
-        return response
-
 
 class MCPServer(FastMCP):
 
@@ -331,9 +318,9 @@ def make_server(
         return RedirectResponse(url=url)
 
     @mcp.tool()
-    async def whoami() -> dict:
+    async def whoami(ctx: Context) -> dict:
         """Returns information about the currently authenticated user."""
-        authorization = request_headers.get().get('authorization')
+        authorization = ctx.request_context.request.headers.get('authorization')
         logger.info('[whoami] <- %s', authorization)
 
         headers = {}
@@ -358,7 +345,7 @@ def make_server(
             raise e
 
     @mcp.custom_route('/', methods=['GET'])
-    async def home(request: Request) -> Response:
+    async def home() -> Response:
         """ Generic home route """
         html = """
         <!DOCTYPE html>
