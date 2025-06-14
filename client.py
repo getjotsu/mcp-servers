@@ -2,6 +2,7 @@ import asyncio
 import functools
 import json
 import logging
+import tomllib
 import os.path
 
 import click
@@ -64,15 +65,15 @@ async def client_session(ctx):
 @click.pass_context
 def cli(ctx, url, log_level, config):
     if not config:
-        if os.path.exists('./.clientrc'):
-            config = './.clientrc'
-        elif os.path.exists('~/.clientrc'):
-            config = '~/.clientrc'
+        if os.path.exists('./client.toml'):
+            config = './client.toml'
+        elif os.path.exists('~/client.toml'):
+            config = '~/client.toml'
 
     config_data = {}
     if config:
-        with open(config, 'r') as f:
-            config_data = json.load(f)
+        with open(config, 'rb') as f:
+            config_data = tomllib.load(f)
 
     logging.basicConfig(level=log_level)
     ctx.ensure_object(dict)

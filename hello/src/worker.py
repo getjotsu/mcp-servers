@@ -13,14 +13,6 @@ from starlette.responses import PlainTextResponse, Response
 logger = logging.getLogger(__name__)
 
 
-async def http_exception(_request: Request, exc: Exception) -> Response:
-    assert isinstance(exc, HTTPException)
-    logger.exception(str(exc))
-    if exc.status_code in {204, 304}:
-        return Response(status_code=exc.status_code, headers=exc.headers)
-    return PlainTextResponse(exc.detail, status_code=exc.status_code, headers=exc.headers)
-
-
 def server_url(request) -> str:
     parsed = urlparse(request.url)
     parsed = parsed._replace(path='')
@@ -34,5 +26,4 @@ async def on_fetch(request, env, ctx):
 
     mcp = setup_server(url=server_url(request))
     app = mcp.streamable_http_app()
-    app.add_exception_handler(HTTPException, http_exception)
     return await asgi.fetch(app, request, env, ctx)

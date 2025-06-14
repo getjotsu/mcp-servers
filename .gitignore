@@ -181,9 +181,10 @@ cython_debug/
 # Node tools
 /node_modules
 
-# Data
+# Data / config
 credentials.json
 clients.json
+client.toml
 
 # Pyodite install
 vendor
