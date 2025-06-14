@@ -1,3 +1,4 @@
+import logging
 import sys
 from urllib.parse import urlparse, urlunparse
 
@@ -8,7 +9,8 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse, Response
 
-from cf import logger
+
+logger = logging.getLogger(__name__)
 
 
 async def http_exception(_request: Request, exc: Exception) -> Response:
