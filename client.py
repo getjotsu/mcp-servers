@@ -8,9 +8,9 @@ import click
 import httpx
 from contextlib import asynccontextmanager
 
-from jotsu.mcp.client import MCPClient
+from jotsu.mcp.common.models import WorkflowServer
+from jotsu.mcp.local import LocalMCPClient
 from jotsu.mcp.client.utils import server_url
-from jotsu.mcp.workflow.models import WorkflowServer
 
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def click_kwargs(args):
 async def client_session(ctx):
     server = WorkflowServer(id='server', name='server', url=ctx.obj['URL'])
 
-    client = MCPClient()
+    client = LocalMCPClient()
     async with client.session(server, headers=ctx.obj.get('headers')) as session:
         yield session
 

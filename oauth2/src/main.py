@@ -1,11 +1,7 @@
 import argparse
 import logging
-import os
-from typing import MutableMapping
 
-import httpx
 from dotenv import load_dotenv
-
 load_dotenv()
 
 from local import LocalClientManager, LocalCache  # noqa

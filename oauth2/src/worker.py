@@ -9,12 +9,10 @@ from urllib.parse import urlparse, urlunparse, urlencode
 sys.path.insert(0, '/session/metadata/vendor')
 sys.path.insert(0, '/session/metadata')
 
-import httpx
-
+import httpx  # noqa: E402
 from mcp.shared.auth import OAuthClientInformationFull  # noqa: E402
+from jotsu.mcp.server import AsyncClientManager, AsyncCache  # noqa: E402
 
-from clients import ClientManager  # noqa: E402
-from cache import AsyncCache  # noqa: E402
 
 # Cloudflare automatic
 from workers import fetch  # noqa
@@ -23,7 +21,7 @@ from workers import fetch  # noqa
 logger = logging.getLogger()
 
 
-class KvClientManager(ClientManager):
+class KvClientManager(AsyncClientManager):
     def __init__(self, env):
         self.env = env
 
@@ -114,13 +112,15 @@ async def on_fetch(request, env, ctx):
         os.environ[key] = getattr(env, key)
 
     httpx_client = MockHttpxAsyncClient()
-    with patch.multiple('httpx.AsyncClient', get=httpx_client.get, post=httpx_client.post):
-        mcp = make_server(
-            issuer_url=server_url(request),
-            client_manager=KvClientManager(env),
-            cache=KvCache(env)
-        )
-        app = mcp.streamable_http_app()
-        # app.add_exception_handler(HTTPException, http_exception)
+    httpx.AsyncClient.get = httpx_client.get
+    httpx.AsyncClient.post = httpx_client.post
 
-        return await asgi.fetch(app, request, env, ctx)
+    mcp = make_server(
+        issuer_url=server_url(request),
+        client_manager=KvClientManager(env),
+        cache=KvCache(env)
+    )
+    app = mcp.streamable_http_app()
+    # app.add_exception_handler(HTTPException, http_exception)
+
+    return await asgi.fetch(app, request, env, ctx)

@@ -27,5 +27,5 @@ echo "Removing built-in packages ..."
 #  rm -rf src/vendor/${x} src/vendor/${x}-*.dist-info
 # done
 # .venv-pyodide/bin/pip install -t src/vendor anyio==4.2.0
-rm -rf srv/vendor/bin
+# rm -rf srv/vendor/bin
 echo "Build completed successfully!"

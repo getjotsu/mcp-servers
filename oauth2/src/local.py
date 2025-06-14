@@ -4,16 +4,14 @@ import asyncio
 import json
 
 from anyio import open_file
+from jotsu.mcp.server import AsyncClientManager, AsyncCache
 from mcp.shared.auth import OAuthClientInformationFull
-
-from clients import ClientManager
-from cache import AsyncCache
 
 
 # All local implementations assume a single uvicorn server process.
 # Multiple processes would require a database or Redis-like implementation.
 
-class LocalClientManager(ClientManager):
+class LocalClientManager(AsyncClientManager):
     HOME = os.path.dirname(os.path.dirname(__file__))
     CLIENTS_FILE = os.path.join('../clients.json')
 
