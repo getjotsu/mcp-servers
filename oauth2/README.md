@@ -1,8 +1,15 @@
 # OAuth2 - MCP Server
-A MCP Server with a  single 'protected' tool named 'whoami' using OAuth2 authentication to query the user's information from Discord.
+An MCP Server with a  single 'protected' tool named 'whoami' using OAuth2 authentication to query the user's information from Discord.
 
-The server can be deployed as a Cloudflare Worker.   Try it at:
-https://oauth2-discord.mcp.jotsu.com/mcp/
+
+## Quick Start
+Try this server live, deployed as a Cloudflare Worker:
+```shell
+uv venv
+source .venv/bin/activate  # or window equivalent
+uv pip install .
+python3 ../client.py --url http://localhost:8787/mcp/ call-tool whoami
+```
 
 ## Prerequisites
 This example uses a Discord application as a third-party authentication provider.  To enable it, you have to:
