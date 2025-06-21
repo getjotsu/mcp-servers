@@ -5,10 +5,6 @@ from urllib.parse import urlparse, urlunparse
 sys.path.insert(0, '/session/metadata/vendor')
 sys.path.insert(0, '/session/metadata')
 
-from starlette.exceptions import HTTPException
-from starlette.requests import Request
-from starlette.responses import PlainTextResponse, Response
-
 
 logger = logging.getLogger(__name__)
 

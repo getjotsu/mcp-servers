@@ -1,21 +1,20 @@
 import asyncio
 import functools
-import json
 import logging
 import tomllib
 import os.path
+from contextlib import asynccontextmanager
 
 import click
 import httpx
-from contextlib import asynccontextmanager
+import certifi
 
 from jotsu.mcp.common.models import WorkflowServer
 from jotsu.mcp.local import LocalMCPClient
 from jotsu.mcp.client.utils import server_url
 
-
+os.environ["SSL_CERT_FILE"] = certifi.where()
 logger = logging.getLogger(__name__)
-
 
 def async_cmd(f):
     @functools.wraps(f)
