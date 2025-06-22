@@ -5,6 +5,15 @@ The `weather` example from `modelcontextprotocol.io` with added support for Clou
 The `weather.py` code from the documentation is found in `server.py`.
 
 
+## Quick Start
+Try this live at: https://weather.mcp.jotsu.com/mcp/.
+
+e.g.
+```
+python3 ../client.py --url=https://weather.mcp.jotsu.com/mcp/ call-tool get_alerts --state=NY
+```
+
+
 ## setup
 ```shell
 uv venv
