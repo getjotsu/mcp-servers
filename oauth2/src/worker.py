@@ -56,6 +56,7 @@ def server_url(request) -> str:
     return str(urlunparse(parsed))
 
 
+# Early workers had problems with httpx (see httpx_patch in other examples)
 class MockHttpxAsyncClient:
     async def get(self, url, **kwargs):
         logger.info('GET -> %s, kwargs=%s', url, str(kwargs))

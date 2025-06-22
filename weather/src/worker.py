@@ -1,12 +1,36 @@
+import json
 import logging
 import sys
-import httpx_patch  # noqa: F401
 
 sys.path.insert(0, '/session/metadata/vendor')
 sys.path.insert(0, '/session/metadata')
 
+import httpx  # noqa: E402
+# Cloudflare automatic
+from workers import fetch  # noqa
+
 
 logger = logging.getLogger(__name__)
+
+
+# Early workers had problems with httpx (see httpx_patch in other examples)
+# This patch is needed to reliably a) set the USER_AGENT header and b) force ipv4.
+class MockHttpxAsyncClient:
+    async def get(self, url, **kwargs):
+        res = await fetch(str(url), method='GET', cf={'ipv6': False}, **kwargs)
+        return await self._response(res, method='GET', url=url)
+
+    # noinspection DuplicatedCode
+    @staticmethod
+    async def _response(res, *, method: str, url: str):
+        req = httpx.Request(method=method, url=url)
+        text = await res.text()
+
+        json_data = None
+        if res.status == 200:
+            json_data = json.loads(text)
+
+        return httpx.Response(res.status, text=text, json=json_data, request=req)
 
 
 async def on_fetch(request, env, ctx):
@@ -30,6 +54,9 @@ async def on_fetch(request, env, ctx):
     root_logger.setLevel(logging.INFO)  # Allow all logs to pass through
     root_logger.addHandler(stdout_handler)
     root_logger.addHandler(stderr_handler)
+
+    httpx_client = MockHttpxAsyncClient()
+    httpx.AsyncClient.get = httpx_client.get
 
     mcp = setup_server()
     app = mcp.streamable_http_app()
