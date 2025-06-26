@@ -56,7 +56,8 @@ class MCPServer(FastMCP):
                 issuer_url=AnyHttpUrl(issuer_url),
                 client_registration_options=ClientRegistrationOptions(enabled=True)
             ),
-            stateless_http=True
+            stateless_http=True,
+            json_response=True
         )
 
     def decode_jwt(self, token: str | None):

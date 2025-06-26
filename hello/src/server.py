@@ -3,7 +3,7 @@ from mcp.server.fastmcp import FastMCP
 
 
 def setup_server(url: str = 'http://localhost:8000'):
-    mcp = FastMCP('Hello MCP Server', stateless_http=True)
+    mcp = FastMCP('Hello MCP Server', stateless_http=True, json_response=True)
 
     # Basic dynamic resource returning a string
     @mcp.resource('resource://greeting')

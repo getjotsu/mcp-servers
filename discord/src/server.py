@@ -22,7 +22,7 @@ class DiscordServer(FastMCP):
 
 
 def make_server():
-    mcp = DiscordServer(name='discord', stateless_http=True)
+    mcp = DiscordServer(name='discord', stateless_http=True, json_response=True)
 
     @mcp.tool(description='Retrieve information about the server/guild referred to by the provided server ID.')
     async def get_server_info(ctx: Context, server_id: str):
