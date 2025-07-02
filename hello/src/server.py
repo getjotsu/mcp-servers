@@ -6,6 +6,12 @@ def setup_server(url: str = 'http://localhost:8000'):
     mcp = FastMCP('Hello MCP Server', stateless_http=True, json_response=True)
 
     # Basic dynamic resource returning a string
+    @mcp.prompt('assist')
+    def prompt() -> str:
+        """Generic prompt."""
+        return f'You are a friendly assistant that always welcomes the user.'
+
+    # Basic dynamic resource returning a string
     @mcp.resource('resource://greeting')
     def get_greeting() -> str:
         """Provides a simple greeting message."""

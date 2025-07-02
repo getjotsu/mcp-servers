@@ -97,12 +97,34 @@ async def list_resources(ctx):
 @click.argument('uri')
 @async_cmd
 async def read_resource(ctx, uri):
-    """List server resources"""
+    """Read a server resource by URI"""
     async with client_session(ctx) as session:
         result = await session.read_resource(uri)
         for content in result.contents:
             click.echo(content)
 
+
+@cli.command()
+@click.pass_context
+@async_cmd
+async def list_prompts(ctx):
+    """List server prompts"""
+    async with client_session(ctx) as session:
+        result = await session.list_prompts()
+        for resource in result.prompts:
+            click.echo(resource)
+
+
+@cli.command()
+@click.pass_context
+@click.argument('name')
+@async_cmd
+async def read_prompt(ctx, name):
+    """Get a prompt by name"""
+    async with client_session(ctx) as session:
+        result = await session.get_prompt(name)
+        for message in result.messages:
+            click.echo(message)
 
 @cli.command()
 @click.pass_context
