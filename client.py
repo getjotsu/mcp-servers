@@ -119,7 +119,7 @@ async def list_prompts(ctx):
 @click.pass_context
 @click.argument('name')
 @async_cmd
-async def read_prompt(ctx, name):
+async def get_prompt(ctx, name):
     """Get a prompt by name"""
     async with client_session(ctx) as session:
         result = await session.get_prompt(name)
