@@ -2,7 +2,7 @@ all: flake8 build
 .PHONY: all
 
 flake8:
-	flake8 src/server.py
+	flake8 src
 .PHONY: flake8
 
 build:

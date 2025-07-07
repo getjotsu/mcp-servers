@@ -17,6 +17,8 @@ from jotsu.mcp.client import OAuth2AuthorizationCodeClient
 
 logger = logging.getLogger('oauth2-discord')
 
+DEFAULT_PORT = 8000
+
 
 class MCPServer(FastMCP):
 
@@ -24,16 +26,18 @@ class MCPServer(FastMCP):
             self, *,
             client_manager: AsyncClientManager,
             cache: AsyncCache,
-            issuer_url: str | None = None
+            issuer_url: str | None = None,
+            port: int = None
     ):
-        issuer_url = issuer_url if issuer_url else 'http://localhost:8000/'
+        port = port or DEFAULT_PORT
+        issuer_url = issuer_url if issuer_url else f'http://localhost:{port}/'
         logger.info('MCP Server: %s', issuer_url)
 
         self.client_manager = client_manager
         self.cache = cache
 
         self.oauth = OAuth2AuthorizationCodeClient(
-            authorize_endpoint='https://discord.com/api/v10/oauth2/authorize',
+            authorization_endpoint='https://discord.com/api/v10/oauth2/authorize',
             token_endpoint='https://discord.com/api/v10/oauth2/token',
             scope='identify',
             client_id=os.environ['DISCORD_CLIENT_ID'],
@@ -57,7 +61,8 @@ class MCPServer(FastMCP):
                 client_registration_options=ClientRegistrationOptions(enabled=True)
             ),
             stateless_http=True,
-            json_response=True
+            json_response=True,
+            port=port
         )
 
     def decode_jwt(self, token: str | None):
@@ -76,9 +81,10 @@ def make_server(
         *,
         client_manager: AsyncClientManager,
         cache: AsyncCache,
-        issuer_url: str | None = None
+        issuer_url: str | None = None,
+        port: int = None
 ):
-    mcp = MCPServer(client_manager=client_manager, cache=cache, issuer_url=issuer_url)
+    mcp = MCPServer(client_manager=client_manager, cache=cache, issuer_url=issuer_url, port=port)
 
     # See: https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization#2-2-example%3A-authorization-code-grant  # noqa
     # Handles 'Redirect to callback URL with auth code'

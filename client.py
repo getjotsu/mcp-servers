@@ -13,8 +13,11 @@ from jotsu.mcp.common.models import WorkflowServer
 from jotsu.mcp.local import LocalMCPClient
 from jotsu.mcp.client.utils import server_url
 
-os.environ["SSL_CERT_FILE"] = certifi.where()
+os.environ['SSL_CERT_FILE'] = certifi.where()
 logger = logging.getLogger(__name__)
+
+DEFAULT_PORT = 8000
+
 
 def async_cmd(f):
     @functools.wraps(f)
@@ -22,7 +25,7 @@ def async_cmd(f):
         coro = f(*args, **kwargs)
         if asyncio.iscoroutine(coro):
             return asyncio.run(coro)
-        raise TypeError(f"Expected coroutine, got {type(coro)}")
+        raise TypeError(f'Expected coroutine, got {type(coro)}')
 
     return wrapper
 
@@ -47,7 +50,6 @@ def click_kwargs(args):
     return kwargs
 
 
-
 @asynccontextmanager
 async def client_session(ctx):
     server = WorkflowServer(id='server', name='server', url=ctx.obj['URL'])
@@ -59,7 +61,7 @@ async def client_session(ctx):
 
 @click.group()
 @click.option('--config', '-c', default=None)
-@click.option('--url', default='http://127.0.0.1:8000/mcp/')
+@click.option('--url', default=f'http://127.0.0.1:{DEFAULT_PORT}/mcp/')
 @click.option('--log-level', default='WARNING')
 @click.pass_context
 def cli(ctx, url, log_level, config):
@@ -125,6 +127,7 @@ async def get_prompt(ctx, name):
         result = await session.get_prompt(name)
         for message in result.messages:
             click.echo(message)
+
 
 @cli.command()
 @click.pass_context

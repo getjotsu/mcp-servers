@@ -21,8 +21,11 @@ class DiscordServer(FastMCP):
         raise httpx.HTTPError('Missing or invalid Bot token')
 
 
+DEFAULT_PORT = 8000
+
+
 def make_server():
-    mcp = DiscordServer(name='discord', stateless_http=True, json_response=True)
+    mcp = DiscordServer(name='discord', stateless_http=True, json_response=True, port=DEFAULT_PORT)
 
     @mcp.tool(description='Retrieve information about the server/guild referred to by the provided server ID.')
     async def get_server_info(ctx: Context, server_id: str):

@@ -2,14 +2,17 @@ from starlette.responses import PlainTextResponse
 from mcp.server.fastmcp import FastMCP
 
 
+DEFAULT_PORT = 8000
+
+
 def setup_server(url: str = 'http://localhost:8000'):
-    mcp = FastMCP('Hello MCP Server', stateless_http=True, json_response=True)
+    mcp = FastMCP('Hello MCP Server', stateless_http=True, json_response=True, port=DEFAULT_PORT)
 
     # Basic dynamic resource returning a string
     @mcp.prompt('assist')
     def prompt() -> str:
         """Generic prompt."""
-        return f'You are a friendly assistant that always welcomes the user.'
+        return 'You are a friendly assistant that always welcomes the user.'
 
     # Basic dynamic resource returning a string
     @mcp.resource('resource://greeting')

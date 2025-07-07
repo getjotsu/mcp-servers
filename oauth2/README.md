@@ -8,7 +8,7 @@ Try this server live, deployed as a Cloudflare Worker:
 uv venv
 source .venv/bin/activate  # or window equivalent
 uv pip install .
-python3 ../client.py --url http://localhost:8787/mcp/ call-tool whoami
+python3 ../client.py call-tool whoami
 ```
 
 ## Prerequisites
@@ -46,7 +46,7 @@ python3 src/main.py
 
 or to run (locally) as a Cloudflare worker:
 ```shell
-npx wrangler dev
+npx wrangler dev --port 8000
 ```
 
 ## client
@@ -91,7 +91,7 @@ make
 
 Try it locally:
 ```shell
-npx wrangler dev
+npx wrangler dev --port 8000
 ```
 
 Make sure you've added your environment to `.dev.vars`.

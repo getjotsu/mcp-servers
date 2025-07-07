@@ -11,7 +11,7 @@ logger = logging.getLogger('oauth2')
 
 mcp = make_server(
     client_manager=LocalClientManager(),
-    cache=LocalCache(),
+    cache=LocalCache()
 )
 
 

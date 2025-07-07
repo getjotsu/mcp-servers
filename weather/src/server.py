@@ -43,8 +43,11 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}
 """
 
 
+DEFAULT_PORT = 8000
+
+
 def setup_server():
-    mcp = FastMCP('NWS Weather MCP Server', stateless_http=True)
+    mcp = FastMCP('NWS Weather MCP Server', stateless_http=True, port=DEFAULT_PORT)
 
     @mcp.tool()
     async def get_alerts(state: str) -> str:
