@@ -32,6 +32,7 @@ def setup_server(url: str = 'http://localhost:8000'):
 
     @mcp.tool()
     def greet(name: str) -> str:
+        """Generates a greeting for the provided name."""
         return f'Hello, {name}!'
 
     @mcp.custom_route('/', methods=['GET'])
