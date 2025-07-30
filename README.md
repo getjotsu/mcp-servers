@@ -17,6 +17,9 @@ The NWS Weather MCP server from the `modelcontextprotocol.io` adapted for deploy
 
 NOTE: This server relies on the NWS API and may hit rate limits.
 
+### mailgun
+Send emails using [Mailgun](https://www.mailgun.com/).
+
 
 ## Client
 There is a simple command line client `client.py` that each of the examples use.  
