@@ -1,0 +1,9 @@
+[project]
+name = "mailgun"
+version = "0.1.0"
+description = "Mailgun MCP Server for sending email."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.9.4"
+]

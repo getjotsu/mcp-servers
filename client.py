@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import json
 import logging
 import tomllib
 import os.path
@@ -9,7 +10,7 @@ import click
 import httpx
 import certifi
 
-from jotsu.mcp.common.models import WorkflowServer
+from jotsu.mcp.types import WorkflowServer
 from jotsu.mcp.local import LocalMCPClient
 from jotsu.mcp.client.utils import server_url
 
@@ -44,6 +45,13 @@ def click_kwargs(args):
                     value = next(it)
                 except StopIteration:
                     raise click.UsageError(f'Missing value for {arg}')
+
+            key = key.replace('-', '_')
+
+            stripped = value.strip()
+            if stripped.startswith('[') or stripped.startswith('{'):
+                value = json.loads(value)
+
             kwargs[key] = value
         else:
             raise click.UsageError(f'Unexpected argument: {arg}')
