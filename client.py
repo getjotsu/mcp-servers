@@ -148,17 +148,26 @@ async def list_tools(ctx):
             click.echo(tool)
 
 
+
 @cli.command(context_settings=dict(ignore_unknown_options=True))
 @click.pass_context
 @click.argument('name')
+@click.option("--use-text", is_flag=True, help="Output as text.")
 @click.argument('args', nargs=-1)
 @async_cmd
-async def call_tool(ctx, name, args):
+async def call_tool(ctx, name, args, use_text: bool):
     """Call/invoke a tool"""
     kwargs = click_kwargs(args)
     async with client_session(ctx) as session:
         result = await session.call_tool(name, kwargs)
-        click.echo(result)
+
+        if use_text:
+            for content in result.content:
+                if content.type == 'text':
+                    click.echo(content.text)
+        else:
+            click.echo(result)
+
 
 
 @cli.command()

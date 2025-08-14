@@ -1,0 +1,15 @@
+[project]
+name = "clickup"
+version = "0.1.0"
+description = "ClickUp MCP Server."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.9.4",
+    "jotsu-mcp>=0.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyodide-build"
+]

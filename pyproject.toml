@@ -13,4 +13,8 @@ dependencies = [
 members = [
     "hello",
     "oauth2",
+    "clickup",
+    "discord",
+    "mailgun",
+    "weather"
 ]
