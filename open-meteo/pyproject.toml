@@ -1,0 +1,15 @@
+[project]
+name = "weather"
+version = "0.1.0"
+description = "The weather MCP example from modelcontextprotocol.io with Cloudflare deployment support."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.9.4"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pyodide-build",
+    "pip"
+]

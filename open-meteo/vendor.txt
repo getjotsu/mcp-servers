@@ -1,0 +1,4 @@
+# Non-standard requirements file used for the pyodide install via HOME/scripts/build.sh.
+
+mcp
+structlog

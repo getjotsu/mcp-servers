@@ -139,23 +139,26 @@ async def get_prompt(ctx, name):
 
 @cli.command()
 @click.pass_context
+@click.option('--indent', type=int, default=None, help='The number of spaces to indent in JSON mode.')
 @async_cmd
-async def list_tools(ctx):
+async def list_tools(ctx, indent: int):
     """List server tools"""
+
     async with client_session(ctx) as session:
         result = await session.list_tools()
         for tool in result.tools:
-            click.echo(tool)
+            click.echo(json.dumps(tool.model_dump(mode='json'), indent=indent))
 
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
 @click.pass_context
 @click.argument('name')
-@click.option("--use-text", is_flag=True, help="Output as text.")
+@click.option('--use-text', is_flag=True, help='Output as text.')
+@click.option('--indent', type=int, default=None, help='The number of spaces to indent in JSON mode.')
 @click.argument('args', nargs=-1)
 @async_cmd
-async def call_tool(ctx, name, args, use_text: bool):
+async def call_tool(ctx, name, args, use_text: bool, indent: int):
     """Call/invoke a tool"""
     kwargs = click_kwargs(args)
     async with client_session(ctx) as session:
@@ -166,7 +169,7 @@ async def call_tool(ctx, name, args, use_text: bool):
                 if content.type == 'text':
                     click.echo(content.text)
         else:
-            click.echo(result)
+            click.echo(json.dumps(result.model_dump(mode='json'), indent=indent))
 
 
 

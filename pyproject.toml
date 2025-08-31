@@ -6,7 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "click>=8.2.1",
-    "mcp[cli]>=1.9.4"
+    "mcp[cli]>=1.9.4",
+    "jotsu-mcp>=0.9.1"
 ]
 
 [tool.uv.workspace]

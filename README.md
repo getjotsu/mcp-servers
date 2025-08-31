@@ -12,8 +12,8 @@ MCP server with full OAuth2 support.   Uses Discord as a pass-through auth serve
 ### discord
 MCP server that can send messages to an authorized Discord server.   Uses a Discord Bot token for authorization.
 
-### weather
-The NWS Weather MCP server from the `modelcontextprotocol.io` adapted for deploying on Cloudflare.
+### us-weather
+The NWS Weather MCP server from the `modelcontextprotocol.io` site adapted for deploying on Cloudflare.
 
 NOTE: This server relies on the NWS API and may hit rate limits.
 
@@ -28,3 +28,14 @@ Other CLI clients don't seem to work well with streamable-http servers.
 
 ## References
 * https://github.com/invariantlabs-ai/mcp-streamable-http
+
+## Development
+Each directory tries to be a stand-alone server.  
+
+### Quickstart
+
+* `cd` into the server directory
+
+```shell
+uv pip install '.[dev]'
+```
