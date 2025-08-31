@@ -17,5 +17,6 @@ members = [
     "clickup",
     "discord",
     "mailgun",
+    "open-meteo",
     "weather"
 ]
