@@ -70,7 +70,7 @@ def setup_server():
 
     @mcp.tool()
     async def get_forecast(latitude: float, longitude: float) -> str:
-        """Get weather forecast for a location.
+        """Get the weather forecast for a given US location.
 
         Args:
             latitude: Latitude of the location
