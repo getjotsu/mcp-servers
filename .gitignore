@@ -185,7 +185,7 @@ cython_debug/
 # Data / config
 credentials.json
 clients.json
-client.toml
+*.toml
 
 # Pyodite install
 vendor

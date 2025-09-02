@@ -13,6 +13,7 @@ import certifi
 from jotsu.mcp.types import WorkflowServer
 from jotsu.mcp.local import LocalMCPClient
 from jotsu.mcp.client.utils import server_url
+from jotsu.mcp.types.shared import OAuthClientInformationFullWithBasicAuth
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 logger = logging.getLogger(__name__)
@@ -62,8 +63,19 @@ def click_kwargs(args):
 async def client_session(ctx):
     server = WorkflowServer(id='server', name='server', url=ctx.obj['URL'])
 
+    headers = ctx.obj.get('headers')
+    authenticate = ctx.obj.get('authenticate')
+
+    client_id = ctx.obj.get('client_id')
+    client_secret = ctx.obj.get('client_secret')
+
+    if client_id and client_secret:
+        server.client_info = OAuthClientInformationFullWithBasicAuth(
+            client_id=client_id, client_secret=client_secret, redirect_uris=ctx.obj.get('redirect_uris')
+        )
+
     client = LocalMCPClient()
-    async with client.session(server, headers=ctx.obj.get('headers')) as session:
+    async with client.session(server, headers=headers, authenticate=authenticate) as session:
         yield session
 
 
@@ -71,8 +83,12 @@ async def client_session(ctx):
 @click.option('--config', '-c', default=None)
 @click.option('--url', default=f'http://127.0.0.1:{DEFAULT_PORT}/mcp/')
 @click.option('--log-level', default='WARNING')
+@click.option('--authenticate', is_flag=True, default=False)
+@click.option('--client-id', default=None)
+@click.option('--client-secret', default=None)
+@click.option('--redirect-uri', multiple=True)
 @click.pass_context
-def cli(ctx, url, log_level, config):
+def cli(ctx, url, log_level, authenticate, client_id, client_secret, config, redirect_uri):
     if not config:
         if os.path.exists('./client.toml'):
             config = './client.toml'
@@ -89,6 +105,11 @@ def cli(ctx, url, log_level, config):
 
     ctx.obj['headers'] = httpx.Headers(config_data['headers']) if 'headers' in config_data else None
     ctx.obj['URL'] = url if url else config_data.get('URL')
+    ctx.obj['authenticate'] = authenticate if authenticate else config_data.get('authenticate')
+    ctx.obj['client_id'] = client_id if client_id else config_data.get('client_id')
+    ctx.obj['client_secret'] = client_secret if client_secret else config_data.get('client_secret')
+    ctx.obj['redirect_uris'] = redirect_uri if redirect_uri else config_data.get('redirect_uris', [])
+    ctx.obj['authenticate'] = authenticate if authenticate else config_data.get('authenticate')
 
 
 @cli.command()
