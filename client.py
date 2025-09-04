@@ -105,7 +105,6 @@ def cli(ctx, url, log_level, authenticate, client_id, client_secret, config, red
 
     ctx.obj['headers'] = httpx.Headers(config_data['headers']) if 'headers' in config_data else None
     ctx.obj['URL'] = url if url else config_data.get('URL')
-    ctx.obj['authenticate'] = authenticate if authenticate else config_data.get('authenticate')
     ctx.obj['client_id'] = client_id if client_id else config_data.get('client_id')
     ctx.obj['client_secret'] = client_secret if client_secret else config_data.get('client_secret')
     ctx.obj['redirect_uris'] = redirect_uri if redirect_uri else config_data.get('redirect_uris', [])
