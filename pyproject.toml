@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "click>=8.2.1",
     "mcp[cli]>=1.9.4",
-    "jotsu-mcp>=0.9.1"
+    "jotsu-mcp>=0.14.0"
 ]
 
 [tool.uv.workspace]

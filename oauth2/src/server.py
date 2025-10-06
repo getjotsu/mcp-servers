@@ -58,7 +58,8 @@ class MCPServer(FastMCP):
             auth_server_provider=auth_server_provider,
             auth=AuthSettings(
                 issuer_url=AnyHttpUrl(issuer_url),
-                client_registration_options=ClientRegistrationOptions(enabled=True)
+                client_registration_options=ClientRegistrationOptions(enabled=True),
+                resource_server_url=None
             ),
             stateless_http=True,
             json_response=True,
@@ -72,7 +73,7 @@ class MCPServer(FastMCP):
                 payload = jwt.decode(token, self._secret_key, algorithms=['HS256'])
                 return payload['token']
             except jwt.exceptions.DecodeError as e:
-                logger.info('Invalid refresh JWT: %s', str(e))
+                logger.info('Invalid JWT: %s', str(e))
 
         return None
 
