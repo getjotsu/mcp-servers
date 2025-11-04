@@ -45,6 +45,6 @@ class ClickupClient(httpx.AsyncClient):
         api_key = cls.api_key(request)
         async with cls(api_key) as client:
             url = client.url(url)
-            response = await client.post(url, headers={'Authorization': client.api_key}, data=data)
+            response = await client.post(url, headers={'Authorization': client.api_key}, json=data)
             response.raise_for_status()
             return response.json()

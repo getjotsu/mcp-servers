@@ -11,7 +11,7 @@ class ClickupCustomField(pydantic.BaseModel):
     value: str | int
 
 
-def setup_server():
+def make_server():
     from clickup import ClickupClient
 
     mcp = FastMCP('Clickup MCP Server', stateless_http=True, json_response=True, port=DEFAULT_PORT)
@@ -86,7 +86,7 @@ def setup_server():
             'tags': tags,
             'status': status,
             'notify_all': notify_all,
-            'custom_fields': custom_fields
+            'custom_fields': [cf.model_dump(mode="json") for cf in custom_fields] if custom_fields else []
         }
         if priority:
             data['priority'] = priority

@@ -22,6 +22,11 @@ where '[MAILGUN_API_KEY]' is replaced with the API Key you created (without brac
 python3 src/main.py
 ```
 
+or to run (locally) as a Cloudflare worker:
+```shell
+npx wrangler dev --port 8000
+```
+
 ## client
 
 List tools:

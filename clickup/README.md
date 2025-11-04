@@ -22,11 +22,21 @@ where '[CLICKUP_API_KEY]' is replaced with the API Key you created (without brac
 python3 src/main.py
 ```
 
+or to run (locally) as a Cloudflare worker:
+```shell
+npx wrangler dev --port 8000
+```
+
 ## client
 
 List tools:
 ```shell
 python3 ../client.py list-tools
+```
+
+Or against the deployed version:
+```shell
+python3 ../client.py --url https://clickup.mcp.jotsu.com/mcp list-tools
 ```
 
 List all of your workspaces/teams:
@@ -38,6 +48,9 @@ Or against the deployed version:
 ```shell
 python3 ../client.py --url=https://clickup.mcp.jotsu.com/mcp/ call-tool get_workspaces
 ```
+
+Call a tool:
+python3 ../client.py call-tool create_task --list_id=123 --name='MyTask'
 
 ## License
 This server was based on ClickUp MCP Server by David Whatley and other contributors:

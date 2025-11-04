@@ -182,6 +182,7 @@ async def call_tool(ctx, name, args, use_text: bool, indent: int):
     """Call/invoke a tool"""
     kwargs = click_kwargs(args)
     async with client_session(ctx) as session:
+
         result = await session.call_tool(name, kwargs)
 
         if use_text:
